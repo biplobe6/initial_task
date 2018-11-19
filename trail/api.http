@@ -1,0 +1,25 @@
+@url = http://127.0.0.1:8000/api/v1/contact
+
+
+###
+POST {{url}}
+Content-Type: application/json
+
+{
+    "name": "arif"
+}
+
+###
+GET {{url}}/2
+
+###
+PUT {{url}}/2
+Content-Type: application/json
+
+{
+    "name": "saddam"
+}
+
+
+###
+GET {{url}}/all
