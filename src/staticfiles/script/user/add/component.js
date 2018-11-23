@@ -9,6 +9,7 @@ angular
                     return alert("Username can't be empty")
                 }
                 userDataStore.addUser(input);
+                this.userInput = ""
                 return false
             }
         }

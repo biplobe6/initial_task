@@ -1,7 +1,13 @@
 <ul class="list-group">
-    <a href="/user/{{ user.id }}"
+    <a
+        href="/user/{{ user.id }}"
         class="list-group-item"
-        ng-repeat="user in $ctrl.users">
+        ng-repeat="user in $ctrl.users | orderBy:user.name:$ctrl.sorted ">
         {{ user.name }}
     </a>
 </ul>
+<span class="pull-right">
+    <button ng-click="$ctrl.toggleSort()" class="{{ $ctrl.sortedClass }}">
+        Short By Name
+    </button>
+</span>
