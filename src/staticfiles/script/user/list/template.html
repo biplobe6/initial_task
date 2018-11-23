@@ -1,9 +1,7 @@
-<div class="col-sm-6 col-sm-offset-3">
-    <ul class="list-group">
-        <a href="/user/{{ user.id }}"
-            class="list-group-item"
-            ng-repeat="user in $ctrl.users">
-            {{ user.name }}
-        </a>
-    </ul>
-</div>
+<ul class="list-group">
+    <a href="/user/{{ user.id }}"
+        class="list-group-item"
+        ng-repeat="user in $ctrl.users">
+        {{ user.name }}
+    </a>
+</ul>

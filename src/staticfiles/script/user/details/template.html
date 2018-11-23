@@ -1,0 +1,14 @@
+<h2 style="text-align:center">User Details</h2>
+<form>
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">ID: </span>
+        <input disabled ng-model="$ctrl.user.id" type="text" class="form-control" placeholder="ID">
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">Name: </span>
+        <input ng-model="$ctrl.user.name" type="text" class="form-control" placeholder="Username">
+        <span class="input-group-btn">
+            <button ng-click="$ctrl.updateUser($ctrl.user.id, $ctrl.user.name)" class="btn btn-default" type="submit">Update</button>
+        </span>
+    </div>
+</form>

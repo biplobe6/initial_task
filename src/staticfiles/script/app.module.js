@@ -1,4 +1,8 @@
 
 angular.module("userApp", [
-    "userList"
+    "ngRoute",
+    "userData",
+    "userAdd",
+    "userList",
+    "userDetails"
 ]);

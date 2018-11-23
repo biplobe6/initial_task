@@ -1,3 +1,5 @@
 
-angular.module("userList", []);
+angular.module("userList", [
+    "userData"
+]);
 

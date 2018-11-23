@@ -1,0 +1,9 @@
+<form>
+	<div class="input-group">
+		<span class="input-group-addon" id="basic-addon1">Add User</span>
+		<input ng-model="$ctrl.userInput" type="text" class="form-control" placeholder="Username">
+		<span class="input-group-btn">
+			<button ng-click="$ctrl.addUser($ctrl.userInput)" class="btn btn-default" type="submit">Save</button>
+		</span>
+	</div>
+</form>

@@ -2,23 +2,37 @@
 <html lang="en" ng-app="userApp">
 <head>
     <meta charset="UTF-8">{% load staticfiles %}
+    <base href="/">
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="{% static 'lib/bootstrap/css/bootstrap.css' %}">
+    
     <script src="{% static 'lib/angular/angular.js' %}"></script>
     <script src="{% static 'lib/angular/angular-route.js' %}"></script>
     
     <script src="{% static 'script/app.module.js' %}"></script>
+    <script src="{% static 'script/app.config.js' %}"></script>
+
+    <script src="{% static 'script/user/data/module.js' %}"></script>
+    <script src="{% static 'script/user/data/service.js' %}"></script>
 
     <script src="{% static 'script/user/list/module.js' %}"></script>
     <script src="{% static 'script/user/list/component.js' %}"></script>
+
+    <script src="{% static 'script/user/add/module.js' %}"></script>
+    <script src="{% static 'script/user/add/component.js' %}"></script>
+
+    <script src="{% static 'script/user/details/module.js' %}"></script>
+    <script src="{% static 'script/user/details/component.js' %}"></script>
     
     <title>Users</title>
 </head>
 <body>
     {% include 'common/navbar.html' %}
-    <user-list></user-list>
+    <div class="col-sm-6 col-sm-offset-3">
+            <ng-view></ng-view>
+    </div>
     <script src="{% static 'lib/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'lib/bootstrap/js/bootstrap.min.js' %}"></script>
 </body>
