@@ -5,12 +5,23 @@ angular
         controller: function (userDataStore) {
             var self = this;
             this.users = userDataStore.getUsers()
+            this.sortby = "name";
             this.sorted = false;
-            self.sortedClass = "btn btn-default"
 
-            self.toggleSort = function () {
-                self.sorted = !self.sorted;
-                self.sortedClass = self.sorted ? "btn btn-default active" : "btn btn-default"
+            this.getClass = function (name) {
+                if(name == self.sortby && self.sorted){
+                    return "btn btn-default active"
+                }
+                return "btn btn-default"
+            }
+
+            self.toggleSort = function (sortby) {
+                if(sortby == self.sortby){
+                    self.sorted = !self.sorted;
+                } else {
+                    self.sortby = sortby;
+                    self.sorted = true;
+                }
             }
         }
     })
