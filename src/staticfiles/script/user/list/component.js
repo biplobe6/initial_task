@@ -3,16 +3,16 @@ angular
     .component("userList", {
         templateUrl: "/static/script/user/list/template.html",
         controller: function (userDataStore) {
-            var self = this;
+            const self = this;
             this.users = userDataStore.getUsers()
             this.sortby = "name";
             this.sorted = false;
 
-            this.getClass = function (name) {
-                if(name == self.sortby && self.sorted){
-                    return "btn btn-default active"
+            this.getSortOrder = function (sortby) {
+                if(sortby == self.sortby){
+                    if(self.sorted) return "(ASC)"
                 }
-                return "btn btn-default"
+                return "(DESC)"
             }
 
             self.toggleSort = function (sortby) {
