@@ -1,0 +1,94 @@
+const gulp = require('gulp');
+const runSequence = require('run-sequence');
+const clean = require('gulp-clean');
+
+const env = {
+    productionMode: true,
+}
+
+// ==============================[ HELPER FUNCTION ]===============================
+const getDestination = (destination) => {
+    if(env.productionMode){
+        return destination.prod
+    }
+    return destination.dev
+}
+
+function copy(src, dest) {
+    return gulp
+            .src(src)
+            .pipe(gulp.dest(dest))
+}
+
+// ================================[ WEBPACK-HTML ]================================
+// django template for this react app.
+const DJANGO_TEMPLATE = {
+    source: './static/*.html',
+    destination: '../projectile/templates/react/assets'
+}
+function djangoTemplate() {
+    return copy(DJANGO_TEMPLATE.source, DJANGO_TEMPLATE.destination)
+}
+
+gulp.task('djangoTemplate', djangoTemplate)
+
+// =====================================[ JS ]=====================================
+const JS_ASSETS = {
+    source: './static/*.js',
+    destination: '../assets/react/'
+}
+
+function copyJs() {
+    return copy(JS_ASSETS.source, JS_ASSETS.destination)
+}
+
+gulp.task('copyJs', copyJs)
+
+// ====================================[ CSS ]=====================================
+const CSS_ASSETS = {
+    source: './static/*.css',
+    destination: '../assets/react/'
+}
+
+function copyCss() {
+    return copy(CSS_ASSETS.source, CSS_ASSETS.destination)
+}
+
+gulp.task('copyCss', copyCss)
+
+// ==============================[ CLEAN-REACT-DIST ]==============================
+function cleanReactDist() {
+    return gulp
+            .src('../assets/react')
+            .pipe(clean({force: true}))
+}
+
+gulp.task('cleanDist', cleanReactDist)
+
+// ===================================[ WATCH ]====================================
+function watchAssets(cb) {
+    gulp.watch(DJANGO_TEMPLATE.source, djangoTemplate)
+}
+
+gulp.task('watchAssets', watchAssets)
+
+gulp.task('watch', () => {
+    env.productionMode = false;
+    runSequence(
+        'djangoTemplate',
+        'watchAssets'
+    )
+})
+
+// ===================================[ BUILD ]====================================
+gulp.task('build', () => {
+    runSequence(
+        [
+            'djangoTemplate',
+            'cleanDist'
+        ], [
+            'copyJs',
+            'copyCss'
+        ]
+    )
+})

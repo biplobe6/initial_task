@@ -1,0 +1,187 @@
+const path                     = require('path');
+const md5                      = require('md5');
+const webpack                  = require('webpack');
+const HtmlWebpackPlugin        = require('html-webpack-plugin');
+const UglifyJsPlugin           = require('uglifyjs-webpack-plugin');
+const OptimizeCssAssetsPlugin  = require('optimize-css-assets-webpack-plugin');
+const MiniCssExtractPlugin     = require('mini-css-extract-plugin');
+const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { CleanWebpackPlugin }   = require('clean-webpack-plugin');
+
+
+const fullPath = (pathName) => path.resolve(__dirname, pathName);
+
+const moduleHelper = {
+    _name: {},
+    getName: (moduleName) => {
+        if(moduleHelper._name[moduleName]){
+            return moduleHelper._name[moduleName]
+        }
+
+        moduleHelper._name[moduleName] = moduleName.replace('@', '')
+        moduleHelper._name[moduleName] = md5(moduleHelper._name[moduleName])
+        return moduleHelper._name[moduleName]
+    }
+}
+
+module.exports = env => {
+    const productionMode = env.NODE_ENV == "production";
+    const configMode = env.NODE_ENV;
+    const STATIC_URL = productionMode ? '/static/' : '/static/'
+    const DEVELOPMENT_PORT = 8686
+    const PUBLIC_PATH = productionMode ? '/static/react/' : (
+        `http://localhost:${DEVELOPMENT_PORT}/static/`
+    )
+
+    const reactHotLoader = productionMode ? [] : [
+        "react-hot-loader/babel"
+    ]
+    const cleanPlugin = productionMode ? [
+        new CleanWebpackPlugin()
+    ] : []
+
+    const devToolConfig = productionMode ? {} : {
+        devtool: "source-map",
+        devServer: {
+            compress: true,
+            historyApiFallback: true,
+            hot: true,
+            port: DEVELOPMENT_PORT,
+            headers: {
+                'Access-Control-Allow-Origin': "*"
+            }
+        }
+    }
+
+    const hotLoaderAlias = productionMode ? {} : {
+        'react-dom': '@hot-loader/react-dom'
+    }
+
+    const optimizationConfig = productionMode ? {
+        optimization: {
+            namedModules: true,
+            runtimeChunk: 'single',
+            splitChunks: {
+                cacheGroups: {
+                    vendor: {
+                        test: /[\\/]node_modules[\\/]/,
+                        enforce: true,
+                        chunks: 'all',
+                        name(module) {
+                            const identifier = module.identifier()
+                            const folders = identifier.split('/')
+                            const node_modulesIndex = folders.indexOf("node_modules")
+                            return moduleHelper.getName(folders[node_modulesIndex + 1]);
+                        }
+                    }
+                }
+            },
+            minimizer: [
+                new UglifyJsPlugin(),
+            ]
+        }
+    } : {}
+
+    const optimizationPlugin = productionMode ? [
+        new OptimizeCssAssetsPlugin(),
+        new MiniCssExtractPlugin({
+            filename: '[name].[chunkhash].css'
+        }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: 'disabled',
+            generateStatsFile: true
+        }),
+    ] : []
+
+    const styleLoader = [
+        productionMode ? MiniCssExtractPlugin.loader : 'style-loader'
+    ]
+
+    const cssSourceMap = productionMode ? '' : '?sourceMap'
+
+    const jsSourceMapFileName = productionMode ? {} : {
+        sourceMapFilename: "[file].map",
+    }
+
+    const webpackConfig = {
+        ...devToolConfig,
+        ...optimizationConfig,
+        resolve: {
+            alias: {
+                ...hotLoaderAlias,
+                App: fullPath('./react-app/app/App/'),
+                Styles: fullPath('./react-app/app/Styles/'),
+                Components: fullPath('./react-app/app/Components/'),
+                Constants: fullPath('./react-app/app/Constants/'),
+                Layouts: fullPath('./react-app/app/Layouts/'),
+                Locales: fullPath('./react-app/app/Locales/'),
+                Pages: fullPath('./react-app/app/Pages/'),
+                Redux: fullPath('./react-app/app/Redux/'),
+                Samples: fullPath('./react-app/app/Samples/'),
+                Templates: fullPath('./react-app/app/Templates/'),
+                Utilities: fullPath('./react-app/app/Utilities/')
+            }
+        },
+        entry: {
+            main: fullPath("react-app/app/main.js"),
+        },
+        output: {
+            path: fullPath('static'),
+            filename: `[name].[${productionMode ? "chunk" : ""}hash].js`,
+            chunkFilename: "[name].[chunkhash].js",
+            ...jsSourceMapFileName,
+            publicPath: PUBLIC_PATH
+        },
+        mode: configMode,
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                "@babel/preset-env",
+                                "@babel/preset-react"
+                            ],
+                            plugins: [
+                                ...reactHotLoader,
+                                "@babel/plugin-syntax-dynamic-import",
+                                "@babel/plugin-proposal-class-properties",
+                                "@babel/plugin-proposal-export-namespace-from",
+                                "@babel/plugin-proposal-throw-expressions"
+                            ]
+                        }
+                    }
+                }, {
+                    test: /\.scss$/,
+                    exclude: /node_modules/,
+                    use: [
+                        ...styleLoader,
+                        'css-loader' + cssSourceMap,
+                        'sass-loader' + cssSourceMap
+                    ]
+                }
+            ]
+        },
+        plugins: [
+            ...cleanPlugin,
+            new HtmlWebpackPlugin({
+                template: './react-app/html/index.html',
+                filename: './index.html',
+                alwaysWriteToDisk: true
+            }),
+            new HtmlWebpackHarddiskPlugin(),
+            new webpack.DefinePlugin({
+                ENV_TYPE: JSON.stringify(env.NODE_ENV),
+                IS_PRODUCTION_MODE: productionMode,
+                STATIC_URL: JSON.stringify(STATIC_URL)
+            }),
+            ...optimizationPlugin
+        ]
+    }
+
+    return webpackConfig;
+}
